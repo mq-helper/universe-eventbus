@@ -2,7 +2,6 @@ package org.mqhelper.eventbus.kafka;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -18,10 +17,10 @@ import org.mqhelper.eventbus.LocalSubscriberRegistry;
  */
 public class KafkaMessageConsumerRegistry {
     private final LocalSubscriberRegistry localSubscriberRegistry;
-    private final Properties props;
+    private final Map<String, Object> props;
     private final Set<Type> registry = Sets.newHashSet();
 
-    public KafkaMessageConsumerRegistry(Properties props, LocalSubscriberRegistry localSubscriberRegistry) {
+    public KafkaMessageConsumerRegistry(Map<String, Object> props, LocalSubscriberRegistry localSubscriberRegistry) {
         this.props = props;
         this.localSubscriberRegistry = localSubscriberRegistry;
     }
@@ -32,19 +31,25 @@ public class KafkaMessageConsumerRegistry {
     }
 
     public void registerKafkaMessageConsumer(Type eventType, EventMessageConsumer eventMessageConsumer) {
-        if (registry.contains(eventType)) {
-            return;
-        }
-        registry.add(eventType);
+        synchronized (this) {
+            if (registry.contains(eventType)) {
+                return;
+            }
+            registry.add(eventType);
 
-        KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
-        KafkaSimpleMessageConsumer kafkaSimpleMessageConsumer = new KafkaSimpleMessageConsumer(eventType,
-            eventMessageConsumer, kafkaConsumer);
-        new Thread(kafkaSimpleMessageConsumer::work).start();
+            KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
+            KafkaSimpleMessageConsumer kafkaSimpleMessageConsumer = new KafkaSimpleMessageConsumer(eventType,
+                eventMessageConsumer, kafkaConsumer);
+            new Thread(kafkaSimpleMessageConsumer::work).start();
+        }
     }
 
     public void registerKafkaMessageConsumer(Map<Type/*event type*/, EventMessageConsumer> eventMessageConsumers) {
         eventMessageConsumers.forEach(
             this::registerKafkaMessageConsumer);
+    }
+
+    public LocalSubscriberRegistry getLocalSubscriberRegistry() {
+        return localSubscriberRegistry;
     }
 }

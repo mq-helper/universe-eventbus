@@ -4,11 +4,7 @@ import java.util.Collection;
 
 import com.google.common.collect.Sets;
 import org.mqhelper.eventbus.EventMessageConsumer;
-import org.mqhelper.eventbus.EventSubscriber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
+import org.mqhelper.eventbus.UniverseEventSubscriber;
 
 /**
  * @author SongyangJi
@@ -16,27 +12,26 @@ import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
  */
 public class DefaultEventMessageConsumer implements EventMessageConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(UNIVERSE_EVENT);
-    private final Collection<EventSubscriber> eventSubscribers = Sets.newHashSet();
+    private final Collection<UniverseEventSubscriber> universeEventSubscribers = Sets.newHashSet();
 
     @Override
     public void dispatchEvent(Object event) {
-        for (EventSubscriber eventSubscriber : eventSubscribers) {
-            eventSubscriber.handleEvent(event);
+        for (UniverseEventSubscriber universeEventSubscriber : universeEventSubscribers) {
+            universeEventSubscriber.handleEvent(event);
         }
     }
 
     @Override
-    public void registerEventSubscriber(EventSubscriber eventSubscriber) {
+    public void registerEventSubscriber(UniverseEventSubscriber universeEventSubscriber) {
         synchronized (this) {
-            eventSubscribers.add(eventSubscriber);
+            universeEventSubscribers.add(universeEventSubscriber);
         }
     }
 
     @Override
-    public void unregisterEventSubscriber(EventSubscriber eventSubscriber) {
+    public void unregisterEventSubscriber(UniverseEventSubscriber universeEventSubscriber) {
         synchronized (this) {
-            eventSubscribers.remove(eventSubscriber);
+            universeEventSubscribers.remove(universeEventSubscriber);
         }
     }
 }

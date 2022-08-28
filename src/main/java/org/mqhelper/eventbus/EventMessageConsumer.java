@@ -9,7 +9,7 @@ package org.mqhelper.eventbus;
 public interface EventMessageConsumer {
     void dispatchEvent(Object event);
 
-    void registerEventSubscriber(EventSubscriber eventSubscriber);
+    void registerEventSubscriber(UniverseEventSubscriber universeEventSubscriber);
 
-    void unregisterEventSubscriber(EventSubscriber eventSubscriber);
+    void unregisterEventSubscriber(UniverseEventSubscriber universeEventSubscriber);
 }

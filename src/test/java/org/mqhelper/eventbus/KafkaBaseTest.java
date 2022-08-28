@@ -19,12 +19,14 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.RetriableException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author SongyangJi
  * @date 2022/08/21
  */
+@Ignore
 public class KafkaBaseTest extends TestCase {
     String BOOTSTRAP_SERVERS =
         "localhost:9092";

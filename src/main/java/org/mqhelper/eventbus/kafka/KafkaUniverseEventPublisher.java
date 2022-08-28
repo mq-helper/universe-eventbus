@@ -9,25 +9,21 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.errors.RetriableException;
 import org.mqhelper.eventbus.BaseEventMessage;
-import org.mqhelper.eventbus.EventPublisher;
+import org.mqhelper.eventbus.UniverseEventPublisher;
 import org.mqhelper.eventbus.exception.PublishEventException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
 import static org.mqhelper.eventbus.kafka.KafkaEventRouter.routingToTopic;
+import static org.mqhelper.eventbus.util.UniverseEventBusLogger.logger;
 
 /**
  * @author SongyangJi
  * @date 2022/08/26
  */
-public class KafkaEventPublisher implements EventPublisher {
-
-    private static final Logger logger = LoggerFactory.getLogger(UNIVERSE_EVENT);
+public class KafkaUniverseEventPublisher implements UniverseEventPublisher {
 
     private final KafkaProducer<String, String/*BaseEventMessage json string*/> kafkaProducer;
 
-    public KafkaEventPublisher(KafkaProducer<String, String> kafkaProducer) {
+    public KafkaUniverseEventPublisher(KafkaProducer<String, String> kafkaProducer) {
         this.kafkaProducer = kafkaProducer;
     }
 

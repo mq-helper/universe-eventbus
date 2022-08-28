@@ -17,12 +17,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 import org.mqhelper.eventbus.EventMessageConsumer;
-import org.mqhelper.eventbus.EventSubscriber;
+import org.mqhelper.eventbus.UniverseEventSubscriber;
 import org.mqhelper.eventbus.LocalSubscriberRegistry;
 import org.mqhelper.eventbus.UniverseSubscriber;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.mqhelper.eventbus.impl.DefaultEventSubscriber.createDefaultEventSubscriber;
+import static org.mqhelper.eventbus.impl.DefaultUniverseEventSubscriber.createDefaultEventSubscriber;
 
 /**
  * @author SongyangJi
@@ -65,16 +65,16 @@ public class DefaultLocalSubscriberRegistry implements LocalSubscriberRegistry {
     @Override
     public void register(Object subscriberHolder) {
         synchronized (this) {
-            Multimap<Type, EventSubscriber> allSubscribers = findAllSubscribers(subscriberHolder);
-            for (Entry<Type, Collection<EventSubscriber>> entry : allSubscribers.asMap().entrySet()) {
+            Multimap<Type, UniverseEventSubscriber> allSubscribers = findAllSubscribers(subscriberHolder);
+            for (Entry<Type, Collection<UniverseEventSubscriber>> entry : allSubscribers.asMap().entrySet()) {
                 Type eventType = entry.getKey();
-                Collection<EventSubscriber> eventSubscribers = entry.getValue();
+                Collection<UniverseEventSubscriber> universeEventSubscribers = entry.getValue();
                 if (eventMessageConsumers.get(eventType) == null) {
                     eventMessageConsumers.put(eventType, new DefaultEventMessageConsumer());
                 }
                 EventMessageConsumer messageConsumer = eventMessageConsumers.get(eventType);
-                for (EventSubscriber eventSubscriber : eventSubscribers) {
-                    messageConsumer.registerEventSubscriber(eventSubscriber);
+                for (UniverseEventSubscriber universeEventSubscriber : universeEventSubscribers) {
+                    messageConsumer.registerEventSubscriber(universeEventSubscriber);
                 }
             }
         }
@@ -83,23 +83,23 @@ public class DefaultLocalSubscriberRegistry implements LocalSubscriberRegistry {
     @Override
     public void unregister(Object subscriberHolder) {
         synchronized (this) {
-            Multimap<Type, EventSubscriber> allSubscribers = findAllSubscribers(subscriberHolder);
-            for (Entry<Type, Collection<EventSubscriber>> entry : allSubscribers.asMap().entrySet()) {
+            Multimap<Type, UniverseEventSubscriber> allSubscribers = findAllSubscribers(subscriberHolder);
+            for (Entry<Type, Collection<UniverseEventSubscriber>> entry : allSubscribers.asMap().entrySet()) {
                 Type eventType = entry.getKey();
-                Collection<EventSubscriber> eventSubscribers = entry.getValue();
+                Collection<UniverseEventSubscriber> universeEventSubscribers = entry.getValue();
                 if (eventMessageConsumers.get(eventType) == null) {
                     continue;
                 }
                 EventMessageConsumer messageConsumer = eventMessageConsumers.get(eventType);
-                for (EventSubscriber eventSubscriber : eventSubscribers) {
-                    messageConsumer.unregisterEventSubscriber(eventSubscriber);
+                for (UniverseEventSubscriber universeEventSubscriber : universeEventSubscribers) {
+                    messageConsumer.unregisterEventSubscriber(universeEventSubscriber);
                 }
             }
         }
     }
 
-    private Multimap<Type, EventSubscriber> findAllSubscribers(Object subscriberHolder) {
-        Multimap<Type, EventSubscriber> subscribersInHolder = HashMultimap.create();
+    private Multimap<Type, UniverseEventSubscriber> findAllSubscribers(Object subscriberHolder) {
+        Multimap<Type, UniverseEventSubscriber> subscribersInHolder = HashMultimap.create();
         Class<?> clazz = subscriberHolder.getClass();
         for (Method method : getAnnotatedMethods(clazz)) {
             Class<?>[] parameterTypes = method.getParameterTypes();

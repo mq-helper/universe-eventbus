@@ -5,20 +5,16 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.mqhelper.eventbus.EventSubscriber;
+import org.mqhelper.eventbus.UniverseEventSubscriber;
 import org.mqhelper.eventbus.SubscriberExceptionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
+import static org.mqhelper.eventbus.util.UniverseEventBusLogger.logger;
 
 /**
  * @author SongyangJi
  * @date 2022/08/25
  */
-public class DefaultEventSubscriber implements EventSubscriber {
-
-    private static final Logger logger = LoggerFactory.getLogger(UNIVERSE_EVENT);
+public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
 
     /**
      * Executor to use for dispatching events to this subscriber.
@@ -34,7 +30,7 @@ public class DefaultEventSubscriber implements EventSubscriber {
      */
     private final Object target;
 
-    private DefaultEventSubscriber(Object target, Method method, Executor executor) {
+    private DefaultUniverseEventSubscriber(Object target, Method method, Executor executor) {
         this.target = target;
         this.method = method;
         this.executor = executor;
@@ -50,7 +46,7 @@ public class DefaultEventSubscriber implements EventSubscriber {
                 } catch (InvocationTargetException e) {
                     subscriberExceptionHandler.handleException(e.getCause());
                 } catch (Exception e) {
-                    logger.error("invokeSubscriberMethod error",e);
+                    logger.error("invokeSubscriberMethod error", e);
                 }
             });
     }
@@ -65,19 +61,19 @@ public class DefaultEventSubscriber implements EventSubscriber {
         /*
          * method is the basic register unit
          */
-        if (obj instanceof DefaultEventSubscriber) {
-            DefaultEventSubscriber that = (DefaultEventSubscriber)obj;
+        if (obj instanceof DefaultUniverseEventSubscriber) {
+            DefaultUniverseEventSubscriber that = (DefaultUniverseEventSubscriber)obj;
             return method.equals(that.method);
         }
         return false;
     }
 
-    public static DefaultEventSubscriber createDefaultEventSubscriber(Object target, Method method) {
-        return new DefaultEventSubscriber(target, method, Executors.newCachedThreadPool());
+    public static DefaultUniverseEventSubscriber createDefaultEventSubscriber(Object target, Method method) {
+        return new DefaultUniverseEventSubscriber(target, method, Executors.newCachedThreadPool());
     }
 
-    public static DefaultEventSubscriber createDefaultEventSubscriber(Object target, Method method, Executor executor) {
-        return new DefaultEventSubscriber(target, method, executor);
+    public static DefaultUniverseEventSubscriber createDefaultEventSubscriber(Object target, Method method, Executor executor) {
+        return new DefaultUniverseEventSubscriber(target, method, executor);
     }
 
     void invokeSubscriberMethod(Object event) throws InvocationTargetException {

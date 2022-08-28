@@ -1,17 +1,17 @@
 package org.mqhelper.eventbus.impl;
 
 import org.mqhelper.eventbus.EventMessageConsumer;
-import org.mqhelper.eventbus.EventPublisher;
+import org.mqhelper.eventbus.UniverseEventPublisher;
 
 /**
  * @author SongyangJi
  * @date 2022/08/26
  */
-public class LocalEventPublisher implements EventPublisher {
+public class LocalUniverseEventPublisher implements UniverseEventPublisher {
 
     private final DefaultLocalSubscriberRegistry localSubscriberRegistry;
 
-    public LocalEventPublisher(DefaultLocalSubscriberRegistry localSubscriberRegistry) {
+    public LocalUniverseEventPublisher(DefaultLocalSubscriberRegistry localSubscriberRegistry) {
         this.localSubscriberRegistry = localSubscriberRegistry;
     }
 

@@ -11,10 +11,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.mqhelper.eventbus.BaseEventMessage;
 import org.mqhelper.eventbus.EventMessageConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
+import static org.mqhelper.eventbus.util.UniverseEventBusLogger.logger;
 
 /**
  * Just for demo
@@ -23,7 +21,6 @@ import static org.mqhelper.eventbus.Constants.UNIVERSE_EVENT;
  * @date 2022/08/28
  */
 public class KafkaSimpleMessageConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(UNIVERSE_EVENT);
     private final EventMessageConsumer eventMessageConsumer;
     private final Type eventType;
     private final KafkaConsumer<String, String/*BaseEventMessage json string*/> kafkaConsumer;
