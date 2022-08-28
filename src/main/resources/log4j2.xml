@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+
+<!-- 监测配置文件的间隔为60秒-->
+<Configuration status="warn" monitorInterval="60">
+    <!--全局参数-->
+    <Properties>
+        <Property name="PROJECT">UNIVERSE_EVENT</Property>>
+    </Properties>
+
+
+    <Appenders>
+        <!-- 输出到命令行 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%date{yyyy-MM-dd HH:mm:ss} %highlight{%-5level} [%threadName] %cyan{%logger{36}} : %msg%n"/>
+        </Console>
+
+        <!-- 输出到命令行 -->
+        <Console name="${PROJECT}_Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%date{yyyy-MM-dd HH:mm:ss} %highlight{%-5level} [%threadName] %magenta{${PROJECT}} %cyan{%class{36}#%method} : %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <root level = "warn">
+            <AppenderRef ref="Console"/>
+        </root>
+        <Logger name="${PROJECT}" level="debug" additivity="false">
+            <AppenderRef ref="${PROJECT}_Console"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
