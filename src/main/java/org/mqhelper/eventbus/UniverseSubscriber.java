@@ -21,4 +21,7 @@ public @interface UniverseSubscriber {
      * @return 失败是否重试
      */
     boolean retryIfFail() default false;
+
+    Class<? extends Exception> exceptionWhenRetry() default Exception.class;
+
 }

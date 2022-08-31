@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.mqhelper.eventbus.UniverseEventSubscriber;
 import org.mqhelper.eventbus.SubscriberExceptionHandler;
+import org.mqhelper.eventbus.UniverseEventSubscriber;
 
 import static org.mqhelper.eventbus.util.UniverseEventBusLogger.logger;
 
@@ -17,10 +17,6 @@ import static org.mqhelper.eventbus.util.UniverseEventBusLogger.logger;
 public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
 
     /**
-     * Executor to use for dispatching events to this subscriber.
-     */
-    private final Executor executor;
-    /**
      * Subscriber method.
      */
     private final Method method;
@@ -29,6 +25,17 @@ public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
      * The object with the subscriber method.
      */
     private final Object target;
+    /**
+     * Executor to use for dispatching events to this subscriber.
+     */
+    private Executor executor;
+
+    /**
+     * value from annotation
+     */
+    private boolean retryIfFail;
+
+    private Class<? extends Exception> exceptionWhenRetry;
 
     private DefaultUniverseEventSubscriber(Object target, Method method, Executor executor) {
         this.target = target;
@@ -44,8 +51,12 @@ public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
                 try {
                     invokeSubscriberMethod(event);
                 } catch (InvocationTargetException e) {
-                    subscriberExceptionHandler.handleException(e.getCause());
-                } catch (Exception e) {
+                    Throwable cause = e.getCause();
+                    subscriberExceptionHandler.handleException(cause);
+                    if (exceptionWhenRetry.isAssignableFrom(cause.getClass())) {
+                        // todo publish event again
+                    }
+                } catch (Throwable e) {
                     logger.error("invokeSubscriberMethod error", e);
                 }
             });
@@ -72,13 +83,17 @@ public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
         return new DefaultUniverseEventSubscriber(target, method, Executors.newCachedThreadPool());
     }
 
-    public static DefaultUniverseEventSubscriber createDefaultEventSubscriber(Object target, Method method, Executor executor) {
+    public static DefaultUniverseEventSubscriber createDefaultEventSubscriber(Object target, Method method,
+        Executor executor) {
         return new DefaultUniverseEventSubscriber(target, method, executor);
     }
 
     void invokeSubscriberMethod(Object event) throws InvocationTargetException {
         try {
             method.invoke(target, event);
+            /*
+             * un retryable exception wraps into error
+             */
         } catch (IllegalArgumentException e) {
             throw new Error("Method rejected target/argument: " + event, e);
         } catch (IllegalAccessException e) {
@@ -89,5 +104,13 @@ public class DefaultUniverseEventSubscriber implements UniverseEventSubscriber {
             }
             throw e;
         }
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
     }
 }
